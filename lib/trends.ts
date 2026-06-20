@@ -160,6 +160,12 @@ export async function buildTrendSignal(
           success: false,
           data: null,
           error: 'Category matches product name',
+          log: {
+            label: 'category',
+            keyword: categoryTerm,
+            body: null,
+            error: 'Category matches product name',
+          },
         } satisfies TrendsFetchResult),
     fetchRisingQueries(categoryTerm).catch(() => [] as string[]),
   ]);
