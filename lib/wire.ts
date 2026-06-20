@@ -383,20 +383,18 @@ async function runTaskWithLogOnce<T = unknown>(
         return { result: { success: false, error: errMsg }, httpStatus, rawBody: jobData };
       }
 
-      const unwrapped = (jobData.data as Record<string, unknown>)?.data?.data?.points ??
-        (jobData.data as Record<string, unknown>)?.data?.data ??
-        (jobData.data as Record<string, unknown>)?.data ??
-        jobData.data;
-      return { result: { success: true, data: unwrapped as T }, httpStatus, rawBody: jobData };
+      const unwrapped = (jobData.data as Record<string, unknown> | undefined)?.['data'] as Record<string, unknown> | undefined;
+      const unwrappedData = unwrapped?.['data'] as Record<string, unknown> | undefined;
+      const finalData = unwrappedData?.['points'] ?? unwrappedData ?? unwrapped ?? jobData.data;
+      return { result: { success: true, data: finalData as T }, httpStatus, rawBody: jobData };
     }
 
     console.log(`[Wire Trends/${logLabel}] Sync response`, JSON.stringify({ httpStatus, body: parsed, action_id, params }, null, 2));
 
-    const unwrappedSync = (data.data as Record<string, unknown>)?.data?.data?.points ??
-      (data.data as Record<string, unknown>)?.data?.data ??
-      (data.data as Record<string, unknown>)?.data ??
-      data.data ??
-      data;
+    const syncData = (data.data as Record<string, unknown> | undefined);
+    const syncData2 = syncData?.['data'] as Record<string, unknown> | undefined;
+    const syncData3 = syncData2?.['data'] as Record<string, unknown> | undefined;
+    const unwrappedSync = syncData3?.['points'] ?? syncData3 ?? syncData2 ?? syncData ?? data;
     return { result: { success: true, data: unwrappedSync as T }, httpStatus, rawBody: parsed };
   } catch (e) {
     console.error(`[Wire Trends/${logLabel}] Exception`, e);
