@@ -15,12 +15,10 @@ function getSql(): NeonQueryFunction<false, false> {
  * Execute a parameterized query.
  * Use $1, $2, ... placeholders (PostgreSQL style).
  *
- * The Neon driver exposes a tagged-template interface by default,
- * but also supports .query(sql, params) for dynamic strings.
+ * db.query() without fullResults:true returns Record<string,any>[] directly.
  */
 export async function query<T = unknown>(sql: string, params?: unknown[]): Promise<T[]> {
   const db = getSql();
-  // .query() accepts a plain string + params array — avoids the TemplateStringsArray constraint
-  const result = await db.query(sql, params ?? []);
-  return result.rows as T[];
+  const rows = await db.query(sql, params ?? []);
+  return rows as unknown as T[];
 }
