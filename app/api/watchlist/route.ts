@@ -121,9 +121,11 @@ export async function PUT(req: NextRequest) {
       item.product_name
     ).catch(() => null);
 
-    const newPrice = cleanInfo?.price
-      ?? parseFloat(scraped.metadata?.price?.replace(/[^0-9.]/g, '') ?? '') 
-      || item.price;
+    const newPrice = (() => {
+      if (cleanInfo?.price != null && cleanInfo.price > 0) return cleanInfo.price;
+      const raw = parseFloat((scraped.metadata?.price ?? '').replace(/[^0-9.]/g, ''));
+      return raw > 0 ? raw : item.price;
+    })();
 
     const newCurrency = cleanInfo?.currency ?? item.currency;
 
